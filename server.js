@@ -17,10 +17,7 @@ const db = require('knex')({
     database : 'smart_brain'
   }
 });
-  
-db.select('*').from('users').then(data => {
-	console.log(data);
-});
+
 
 const database = {
 	users: [
@@ -50,39 +47,56 @@ app.get('/', (req, res)=> {
 app.post('/signin', (req, res)=> {
 	if (req.body.email === database.users[0].email &&
 		req.body.password === database.users[0].password) {
-		res.json('success')
+		res.json(database.users[0])
 	} else {
 		res.status(400).json('error logging in')
 	}
 })
 
 app.post('/register', (req, res)=> {
-	const { name, email, password } = req.body;
-	const hash = bcrypt.hashSync(password);
-		db.transaction(trx => {
-			trx.insert({
-			hash: hash,
-			email: email
-		})
-		.into('login')
-		.returning('email')
-		.then(loginEmail => {
-			return trx('users')
-				.returning('*')
-				.insert({
-					email: loginEmail,
-					name: name,
-					joined: new Date()
-				})
-				.then(user => {
-					res.json(user[0]);
-				})
-			})
-			.then(trx.commit)
-			.catch(trx.rollback)
-		})
-		.catch(err => res.status(400).json('unable to register'))
+	const { email, name, password } = req.body;
+	db('users')
+	.returning('*')
+	.insert({
+		name: name,
+		email: email,
+		joined: new Date()
 	})
+	.then(user => {
+		res.json(user[0])
+	})
+	.catch(err => res.status(400).json('unable to join'))
+})
+
+// 
+
+// {
+// 	const { name, email, password } = req.body;
+// 	const hash = bcrypt.hashSync(password);
+// 		db.transaction(trx => {
+// 			trx.insert({
+// 			hash: hash,
+// 			email: email
+// 		})
+// 		.into('login')
+// 		.returning('email')
+// 		.then(loginEmail => {
+// 			return trx('users')
+// 				.returning('*')
+// 				.insert({
+// 					email: loginEmail,
+// 					name: name,
+// 					joined: new Date()
+// 				})
+// 				.then(user => {
+// 					res.json(user[0]);
+// 				})
+// 			})
+// 			.then(trx.commit)
+// 			.catch(trx.rollback)
+// 		})
+// 		.catch(err => res.status(400).json('unable to register'))
+// 	})
 
 
 app.get('/profile/:id', (req, res)=> {
