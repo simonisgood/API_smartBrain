@@ -17,8 +17,10 @@ app.use(cors());
 const db = require('knex')({
   client: 'pg',
   connection: {
-    connectionString : process.env.DATABASE_URL,
-    ssl: true
+    host : '127.0.0.1',
+    user : 'postgres',
+    password : 'simon0938964930',
+    database : 'smart_brain'
   }
 });
 
@@ -29,6 +31,7 @@ app.get('/profile/:id', (req, res) => { profile.handleProfileGet(req, res, db) }
 app.put('/image', (req, res) => { image.handleImage(req, res, db) })
 app.post('/imageurl', (req, res) => { image.handleApiCall(req, res) })
 
-app.listen(process.env.DATABASE_URL || 3000, ()=> {
-	console.log(`app is running on port ${process.env.DATABASE_URL}`)
+const PORT = process.env.PORT
+app.listen(PORT || 3000, ()=> {
+	console.log(`app is running on port ${PORT}`)
 })
