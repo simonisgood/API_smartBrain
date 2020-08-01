@@ -14,12 +14,10 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-const PORT = process.env.PORT
-
 const db = require('knex')({
   client: 'pg',
   connection: {
-    connectionString : PORT,
+    connectionString : process.env.DATABASE_URL,
     ssl: true
   }
 });
@@ -31,6 +29,6 @@ app.get('/profile/:id', (req, res) => { profile.handleProfileGet(req, res, db) }
 app.put('/image', (req, res) => { image.handleImage(req, res, db) })
 app.post('/imageurl', (req, res) => { image.handleApiCall(req, res) })
 
-app.listen(PORT || 3000, ()=> {
-	console.log(`app is running on port ${PORT}`)
+app.listen(process.env.DATABASE_URL || 3000, ()=> {
+	console.log(`app is running on port ${process.env.DATABASE_URL}`)
 })
